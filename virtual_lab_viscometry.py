@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 )
@@ -32,6 +33,31 @@ mark_houwink = {
     "Polyvinyl Alcohol (PVA)": {"K": 3.7e-4, "a": 0.65},
     "Polyethylene Oxide (PEO)": {"K": 6.4e-4, "a": 0.65},
 }
+
+# ------------------------------
+# FEEDBACK FILE
+# ------------------------------
+feedback_file = "feedback_log.csv"
+
+def initialize_feedback_file():
+    if not os.path.exists(feedback_file):
+        with open(feedback_file, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Name", "Register Number", "Rating", "Feedback", "Suggestion", "DateTime"])
+
+def save_feedback(name, reg_no, rating, feedback_text, suggestion):
+    with open(feedback_file, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            name,
+            reg_no,
+            rating,
+            feedback_text,
+            suggestion,
+            datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        ])
+
+initialize_feedback_file()
 
 # ------------------------------
 # HEADER
