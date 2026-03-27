@@ -29,6 +29,8 @@ mark_houwink = {
     "Polystyrene": {"K": 1.1e-4, "a": 0.73},
     "PMMA": {"K": 5.5e-4, "a": 0.76},
     "PVC": {"K": 6.3e-4, "a": 0.62},
+    "Polyvinyl Alcohol (PVA)": {"K": 3.7e-4, "a": 0.65},
+    "Polyethylene Oxide (PEO)": {"K": 6.4e-4, "a": 0.65},
 }
 
 # ------------------------------
@@ -108,33 +110,51 @@ elif section == "Experiment":
     st.markdown("---")
     st.subheader("📝 Observation Table")
 
-    # Default table
-    default_data = pd.DataFrame({
-        "Concentration (g/dL)": np.round(np.linspace(0.2, 1.0, int(n)), 2),
-        "Flow Time (s)": np.round(np.linspace(110, 150, int(n)), 2)
-    })
+# Empty observation table
+default_data = pd.DataFrame({
+    "Concentration (g/dL)": [""] * int(n),
+    "Flow Time (s)": [""] * int(n)
+})
 
-    data = st.data_editor(
-        default_data,
-        num_rows="fixed",
-        use_container_width=True,
-        key="data_editor"
-    )
+data = st.data_editor(
+    default_data,
+    num_rows="fixed",
+    use_container_width=True,
+    key="data_editor"
+)
 
     # ------------------------------
     # VALIDATION
     # ------------------------------
     valid = True
-    error_messages = []
+error_messages = []
 
-    if student_name.strip() == "":
-        valid = False
-        error_messages.append("Student name is required.")
+if student_name.strip() == "":
+    valid = False
+    error_messages.append("Student name is required.")
 
-    if reg_no.strip() == "":
-        valid = False
-        error_messages.append("Register number is required.")
+if reg_no.strip() == "":
+    valid = False
+    error_messages.append("Register number is required.")
 
+# Check for blank cells
+if data["Concentration (g/dL)"].astype(str).str.strip().eq("").any():
+    valid = False
+    error_messages.append("Please enter all concentration values.")
+
+if data["Flow Time (s)"].astype(str).str.strip().eq("").any():
+    valid = False
+    error_messages.append("Please enter all flow time values.")
+
+# Convert after checking blanks
+try:
+    data["Concentration (g/dL)"] = pd.to_numeric(data["Concentration (g/dL)"])
+    data["Flow Time (s)"] = pd.to_numeric(data["Flow Time (s)"])
+except:
+    valid = False
+    error_messages.append("Please enter only numeric values in the observation table.")
+
+if valid:
     if (data["Concentration (g/dL)"] <= 0).any():
         valid = False
         error_messages.append("All concentration values must be greater than zero.")
@@ -142,7 +162,7 @@ elif section == "Experiment":
     if (data["Flow Time (s)"] <= 0).any():
         valid = False
         error_messages.append("All flow time values must be greater than zero.")
-
+        
     # ------------------------------
     # CALCULATE BUTTON
     # ------------------------------
