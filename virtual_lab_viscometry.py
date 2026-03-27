@@ -54,8 +54,8 @@ section = st.sidebar.radio(
 if section == "Aim & Theory":
     st.header("🎯 Aim")
     st.write("""
-    To determine the **intrinsic viscosity** and **molecular weight** of a polymer
-    using viscometric data and the **Mark–Houwink equation**.
+    To determine the intrinsic viscosity and molecular weight of a polymer
+    using viscometric data and the Mark–Houwink equation.
     """)
 
     st.header("📖 Theory")
@@ -110,59 +110,60 @@ elif section == "Experiment":
     st.markdown("---")
     st.subheader("📝 Observation Table")
 
-# Empty observation table
-default_data = pd.DataFrame({
-    "Concentration (g/dL)": [""] * int(n),
-    "Flow Time (s)": [""] * int(n)
-})
+    # Empty observation table
+    default_data = pd.DataFrame({
+        "Concentration (g/dL)": [""] * int(n),
+        "Flow Time (s)": [""] * int(n)
+    })
 
-data = st.data_editor(
-    default_data,
-    num_rows="fixed",
-    use_container_width=True,
-    key="data_editor"
-)
+    data = st.data_editor(
+        default_data,
+        num_rows="fixed",
+        use_container_width=True,
+        key="data_editor"
+    )
 
     # ------------------------------
     # VALIDATION
     # ------------------------------
     valid = True
-error_messages = []
+    error_messages = []
 
-if student_name.strip() == "":
-    valid = False
-    error_messages.append("Student name is required.")
-
-if reg_no.strip() == "":
-    valid = False
-    error_messages.append("Register number is required.")
-
-# Check for blank cells
-if data["Concentration (g/dL)"].astype(str).str.strip().eq("").any():
-    valid = False
-    error_messages.append("Please enter all concentration values.")
-
-if data["Flow Time (s)"].astype(str).str.strip().eq("").any():
-    valid = False
-    error_messages.append("Please enter all flow time values.")
-
-# Convert after checking blanks
-try:
-    data["Concentration (g/dL)"] = pd.to_numeric(data["Concentration (g/dL)"])
-    data["Flow Time (s)"] = pd.to_numeric(data["Flow Time (s)"])
-except:
-    valid = False
-    error_messages.append("Please enter only numeric values in the observation table.")
-
-if valid:
-    if (data["Concentration (g/dL)"] <= 0).any():
+    if student_name.strip() == "":
         valid = False
-        error_messages.append("All concentration values must be greater than zero.")
+        error_messages.append("Student name is required.")
 
-    if (data["Flow Time (s)"] <= 0).any():
+    if reg_no.strip() == "":
         valid = False
-        error_messages.append("All flow time values must be greater than zero.")
-        
+        error_messages.append("Register number is required.")
+
+    # Check blank cells
+    if data["Concentration (g/dL)"].astype(str).str.strip().eq("").any():
+        valid = False
+        error_messages.append("Please enter all concentration values.")
+
+    if data["Flow Time (s)"].astype(str).str.strip().eq("").any():
+        valid = False
+        error_messages.append("Please enter all flow time values.")
+
+    # Convert to numeric only if not blank
+    if valid:
+        try:
+            data["Concentration (g/dL)"] = pd.to_numeric(data["Concentration (g/dL)"])
+            data["Flow Time (s)"] = pd.to_numeric(data["Flow Time (s)"])
+        except:
+            valid = False
+            error_messages.append("Please enter only numeric values in the observation table.")
+
+    if valid:
+        if (data["Concentration (g/dL)"] <= 0).any():
+            valid = False
+            error_messages.append("All concentration values must be greater than zero.")
+
+        if (data["Flow Time (s)"] <= 0).any():
+            valid = False
+            error_messages.append("All flow time values must be greater than zero.")
+
     # ------------------------------
     # CALCULATE BUTTON
     # ------------------------------
@@ -186,7 +187,6 @@ if valid:
             intrinsic = coeffs[1]
             Mv = (intrinsic / K) ** (1 / a) if intrinsic > 0 else np.nan
 
-            # Result table
             result_df = pd.DataFrame({
                 "Concentration": np.round(concentration, 4),
                 "Flow Time": np.round(flow_time, 4),
@@ -200,9 +200,7 @@ if valid:
             st.subheader("📊 Calculated Observation Table")
             st.dataframe(result_df, use_container_width=True)
 
-            # ------------------------------
-            # GRAPH
-            # ------------------------------
+            # Graph
             st.subheader("📈 Graph: Reduced Viscosity vs Concentration")
 
             fig, ax = plt.subplots(figsize=(8, 5))
@@ -219,9 +217,7 @@ if valid:
             st.pyplot(fig)
             plt.close(fig)
 
-            # ------------------------------
-            # RESULTS
-            # ------------------------------
+            # Results
             st.subheader("📌 Final Results")
 
             r1, r2, r3 = st.columns(3)
@@ -234,9 +230,7 @@ if valid:
             else:
                 st.metric("Molecular Weight (Mv)", f"{Mv:.2f}")
 
-            # ------------------------------
-            # INTERPRETATION
-            # ------------------------------
+            # Interpretation
             st.subheader("🧠 Interpretation")
             if intrinsic > 0:
                 st.write(f"""
@@ -250,9 +244,7 @@ if valid:
                 Please verify your experimental readings.
                 """)
 
-            # ------------------------------
-            # PDF REPORT GENERATION
-            # ------------------------------
+            # PDF REPORT
             st.subheader("📄 Download Experiment Report")
 
             pdf_file = f"{student_name.replace(' ', '_')}_Viscometry_Report.pdf"
@@ -271,13 +263,11 @@ if valid:
 
             content = []
 
-            # Header
             content.append(Paragraph(
                 "<b>SRM Institute of Science and Technology, Tiruchirappalli</b>",
                 center_style
             ))
             content.append(Spacer(1, 10))
-
             content.append(Paragraph("<b>Faculty of Engineering and Technology</b>", center_style))
             content.append(Paragraph("<b>Department of Chemistry</b>", center_style))
             content.append(Spacer(1, 15))
@@ -288,20 +278,17 @@ if valid:
             ))
             content.append(Spacer(1, 20))
 
-            # Student details
             content.append(Paragraph(f"<b>Name:</b> {student_name}", style['Normal']))
             content.append(Paragraph(f"<b>Register Number:</b> {reg_no}", style['Normal']))
             content.append(Paragraph(f"<b>Department/Class:</b> {department}", style['Normal']))
             content.append(Paragraph(f"<b>Date:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}", style['Normal']))
             content.append(Spacer(1, 10))
 
-            # Experiment details
             content.append(Paragraph("<b>Experiment Details</b>", style['Heading2']))
             content.append(Paragraph(f"Polymer: {polymer_name}", style['Normal']))
             content.append(Paragraph(f"Solvent flow time (t₀): {t0} s", style['Normal']))
             content.append(Spacer(1, 10))
 
-            # Table
             table_data = [["Conc", "Flow time", "Rel", "Spec", "Red"]]
             for i in range(len(concentration)):
                 table_data.append([
@@ -323,7 +310,6 @@ if valid:
             content.append(table)
             content.append(Spacer(1, 15))
 
-            # Theory
             content.append(Paragraph("<b>Theory & Formula</b>", style['Heading2']))
             content.append(Paragraph("<b>Relative viscosity (ηr = t / t₀):</b> Ratio of solution flow time to solvent flow time.", style['Normal']))
             content.append(Paragraph("<b>Specific viscosity (ηsp = ηr − 1):</b> Increase in viscosity due to polymer.", style['Normal']))
@@ -332,7 +318,6 @@ if valid:
             content.append(Paragraph("<b>Mark–Houwink Equation:</b> [η] = K Mᵃ", style['Normal']))
             content.append(Spacer(1, 15))
 
-            # Results
             content.append(Paragraph("<b>Results</b>", style['Heading2']))
             content.append(Paragraph(f"Intrinsic viscosity = {intrinsic:.4f}", style['Normal']))
             content.append(Paragraph(f"K = {K}, α = {a}", style['Normal']))
@@ -343,7 +328,6 @@ if valid:
 
             content.append(Spacer(1, 15))
 
-            # Conclusion
             content.append(Paragraph(
                 "This experiment was performed using a Virtual Lab model, which eliminates the need for physical instruments "
                 "and enables students from various disciplines to understand polymer characterization through computational methods. "
@@ -353,7 +337,6 @@ if valid:
 
             content.append(Spacer(1, 15))
 
-            # Graph
             content.append(Paragraph("<b>Graph</b>", style['Heading2']))
             if os.path.exists(graph_file):
                 content.append(Image(graph_file, width=400, height=300))
