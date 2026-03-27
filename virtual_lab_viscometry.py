@@ -543,8 +543,8 @@ elif section == "Feedback":
 
     st.markdown("---")
 
-    fb_name = st.text_input("Enter Your Name", key="fb_name")
-    fb_reg = st.text_input("Enter Register Number", key="fb_reg")
+    fb_name = st.text_input("Enter Your Name (Optional)", key="fb_name")
+    fb_reg = st.text_input("Enter Register Number (Optional)", key="fb_reg")
 
     rating = st.slider("Rate this Virtual Lab (1 = Poor, 5 = Excellent)", 1, 5, 4)
 
@@ -555,13 +555,17 @@ elif section == "Feedback":
     suggestion = st.text_area("Any suggestion for improvement?")
 
     if st.button("Submit Feedback"):
-        if fb_name.strip() == "" or fb_reg.strip() == "":
-            st.error("Please enter your Name and Register Number.")
-        else:
-            save_feedback(fb_name, fb_reg, rating, feedback_text, suggestion)
-            st.success("✅ Thank you! Your feedback has been submitted successfully.")
-            st.balloons()
-            st.info(f"Your Rating: {'⭐' * rating}")
+        # Make name and reg optional
+        if fb_name.strip() == "":
+            fb_name = "Anonymous"
+
+        if fb_reg.strip() == "":
+            fb_reg = "Not Provided"
+
+        save_feedback(fb_name, fb_reg, rating, feedback_text, suggestion)
+        st.success("✅ Thank you! Your feedback has been submitted successfully.")
+        st.balloons()
+        st.info(f"Your Rating: {'⭐' * rating}")
 
     st.markdown("---")
     st.subheader("📌 Why your feedback matters")
@@ -571,3 +575,4 @@ elif section == "Feedback":
     - making the experiment more user-friendly
     - enhancing teaching innovation
     """)
+    
