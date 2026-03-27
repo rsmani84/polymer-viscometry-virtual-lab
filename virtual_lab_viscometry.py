@@ -551,28 +551,19 @@ elif section == "Feedback":
     st.write("### ⭐ Your Rating")
     st.write("⭐" * rating)
 
-    feedback_text = st.text_area("What did you like about this Virtual Lab?")
-    suggestion = st.text_area("Any suggestion for improvement?")
+    feedback_text = st.text_area("What did you like about this Virtual Lab? (Optional)")
+    suggestion = st.text_area("Any suggestion for improvement? (Optional)")
 
     if st.button("Submit Feedback"):
         # Make name and reg optional
-        if fb_name.strip() == "":
-            fb_name = "Anonymous"
+        final_name = fb_name.strip() if fb_name.strip() else "Anonymous"
+        final_reg = fb_reg.strip() if fb_reg.strip() else "Not Provided"
+        final_feedback = feedback_text.strip() if feedback_text.strip() else "No feedback provided"
+        final_suggestion = suggestion.strip() if suggestion.strip() else "No suggestion provided"
 
-        if fb_reg.strip() == "":
-            fb_reg = "Not Provided"
+        save_feedback(final_name, final_reg, rating, final_feedback, final_suggestion)
 
-        save_feedback(fb_name, fb_reg, rating, feedback_text, suggestion)
         st.success("✅ Thank you! Your feedback has been submitted successfully.")
         st.balloons()
         st.info(f"Your Rating: {'⭐' * rating}")
-
-    st.markdown("---")
-    st.subheader("📌 Why your feedback matters")
-    st.write("""
-    Your feedback helps improve this Virtual Lab by:
-    - improving student learning experience
-    - making the experiment more user-friendly
-    - enhancing teaching innovation
-    """)
-    
+        
