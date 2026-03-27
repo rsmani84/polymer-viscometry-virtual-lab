@@ -356,53 +356,170 @@ elif section == "Experiment":
 # ------------------------------
 elif section == "Quiz":
     st.header("🧠 Viva / Quiz Section")
+    st.write("Answer the following questions to test your understanding of polymer viscometry.")
 
     score = 0
+    feedback = []
 
+    # Q1
     q1 = st.radio(
         "1. What is relative viscosity (ηr)?",
-        [
-            "t₀ / t",
-            "t / t₀",
-            "ηsp / C",
-            "KMa"
-        ]
+        ["t₀ / t", "t / t₀", "ηsp / C", "KMa"],
+        key="q1"
     )
 
+    # Q2
     q2 = st.radio(
         "2. What is obtained from the intercept of reduced viscosity vs concentration graph?",
-        [
-            "Flow time",
-            "Specific viscosity",
-            "Intrinsic viscosity",
-            "Polymer density"
-        ]
+        ["Flow time", "Specific viscosity", "Intrinsic viscosity", "Polymer density"],
+        key="q2"
     )
 
+    # Q3
     q3 = st.radio(
         "3. Which equation is used to estimate molecular weight?",
+        ["Arrhenius equation", "Beer-Lambert law", "Mark–Houwink equation", "Nernst equation"],
+        key="q3"
+    )
+
+    # Q4
+    q4 = st.radio(
+        "4. What does specific viscosity (ηsp) represent?",
         [
-            "Arrhenius equation",
-            "Beer-Lambert law",
-            "Mark–Houwink equation",
-            "Nernst equation"
-        ]
+            "Ratio of flow times",
+            "Increase in viscosity due to polymer",
+            "Polymer concentration",
+            "Intrinsic viscosity"
+        ],
+        key="q4"
+    )
+
+    # Q5
+    q5 = st.radio(
+        "5. Which quantity is plotted on the y-axis in this experiment?",
+        [
+            "Flow Time",
+            "Concentration",
+            "Reduced Viscosity (ηsp/C)",
+            "Molecular Weight"
+        ],
+        key="q5"
+    )
+
+    # Q6
+    q6 = st.radio(
+        "6. Which quantity is plotted on the x-axis in this experiment?",
+        [
+            "Reduced Viscosity",
+            "Concentration",
+            "Relative Viscosity",
+            "Molecular Weight"
+        ],
+        key="q6"
+    )
+
+    # Q7
+    q7 = st.radio(
+        "7. If polymer concentration increases, the viscosity generally:",
+        [
+            "Decreases",
+            "Increases",
+            "Remains zero",
+            "Becomes negative"
+        ],
+        key="q7"
+    )
+
+    # Q8
+    q8 = st.radio(
+        "8. What does the constant α (alpha) in the Mark–Houwink equation indicate?",
+        [
+            "Color of polymer",
+            "Polymer chain shape in solution",
+            "Temperature of solvent",
+            "Density of polymer"
+        ],
+        key="q8"
+    )
+
+    # Q9
+    q9 = st.radio(
+        "9. Why is extrapolation to zero concentration needed?",
+        [
+            "To find solvent density",
+            "To calculate flow time",
+            "To obtain intrinsic viscosity",
+            "To remove the graph"
+        ],
+        key="q9"
+    )
+
+    # Q10
+    q10 = st.radio(
+        "10. Which of the following is a major advantage of this virtual lab?",
+        [
+            "Needs expensive instruments every time",
+            "Cannot generate graphs",
+            "Allows computational learning without wet-lab setup",
+            "Removes all chemistry concepts"
+        ],
+        key="q10"
     )
 
     if st.button("Submit Quiz"):
-        if q1 == "t / t₀":
-            score += 1
-        if q2 == "Intrinsic viscosity":
-            score += 1
-        if q3 == "Mark–Houwink equation":
-            score += 1
+        # Correct answers and feedback
+        answers = {
+            "q1": ("t / t₀", "Relative viscosity is defined as solution flow time divided by solvent flow time."),
+            "q2": ("Intrinsic viscosity", "The intercept of the reduced viscosity vs concentration graph gives intrinsic viscosity."),
+            "q3": ("Mark–Houwink equation", "The Mark–Houwink equation is used to estimate molecular weight from intrinsic viscosity."),
+            "q4": ("Increase in viscosity due to polymer", "Specific viscosity shows how much the polymer increases the viscosity of the solution."),
+            "q5": ("Reduced Viscosity (ηsp/C)", "The y-axis represents reduced viscosity in this experiment."),
+            "q6": ("Concentration", "The x-axis represents polymer concentration."),
+            "q7": ("Increases", "As polymer concentration increases, solution viscosity usually increases."),
+            "q8": ("Polymer chain shape in solution", "The alpha value gives information about polymer conformation in solution."),
+            "q9": ("To obtain intrinsic viscosity", "Extrapolation to zero concentration is needed to determine intrinsic viscosity."),
+            "q10": ("Allows computational learning without wet-lab setup", "A major benefit of the virtual lab is computational learning without depending fully on physical instruments.")
+        }
 
-        st.success(f"✅ Your Score: {score}/3")
+        user_answers = {
+            "q1": q1,
+            "q2": q2,
+            "q3": q3,
+            "q4": q4,
+            "q5": q5,
+            "q6": q6,
+            "q7": q7,
+            "q8": q8,
+            "q9": q9,
+            "q10": q10
+        }
 
-        if score == 3:
+        for q, (correct, explanation) in answers.items():
+            if user_answers[q] == correct:
+                score += 1
+                feedback.append(f"✅ {q.upper()}: Correct — {explanation}")
+            else:
+                feedback.append(f"❌ {q.upper()}: Incorrect. Correct Answer: **{correct}** — {explanation}")
+
+        st.success(f"🎯 Your Score: {score}/10")
+
+        # Performance feedback
+        st.subheader("📌 Performance Feedback")
+
+        if score == 10:
             st.balloons()
-            st.write("Excellent! You understood the experiment very well.")
-        elif score == 2:
-            st.write("Good job! Review the theory once more for full clarity.")
+            st.success("Excellent! You have a very strong understanding of polymer viscometry and molecular weight determination.")
+        elif score >= 8:
+            st.info("Very Good! You understood most concepts well. Only minor revision is needed.")
+        elif score >= 6:
+            st.warning("Good attempt. You understand the basics, but some concepts need revision.")
+        elif score >= 4:
+            st.warning("Fair attempt. Please review the theory and graph interpretation carefully.")
         else:
-            st.write("Please revise the theory section and try again.")
+            st.error("You need more revision. Go back to the Aim & Theory section and try again.")
+
+        # Detailed feedback
+        st.subheader("📝 Question-wise Feedback")
+        for item in feedback:
+            st.write(item)
+            
